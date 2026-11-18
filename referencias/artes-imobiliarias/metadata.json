@@ -1,0 +1,9 @@
+
+{
+  "name": "Artes Imobiliárias - Gerador de Criativos",
+  "description": "Plataforma premium de geração de criativos para o mercado imobiliário utilizando Inteligência Artificial.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}

@@ -1,0 +1,14 @@
+.DS_Store
+node_modules/
+dist/
+.local/
+.env
+.env.*
+!.env.example
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
+*.log
+*.zip
+/referencias/deith-creative-studio/
