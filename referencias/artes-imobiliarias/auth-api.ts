@@ -39,6 +39,15 @@ export function authApi(): Plugin { return { name: 'local-auth', configureServer
     }
     if (req.method === 'POST' && route === '/logout') { const token = /(?:^|;\s*)creative_session=([^;]+)/.exec(req.headers.cookie || '')?.[1]; if (token) sessions.delete(token); res.setHeader('Set-Cookie', 'creative_session=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0'); return send(200, { ok: true }); }
     if (req.method === 'GET' && route === '/users') { const user = currentUser(req); if (!user || user.status !== 'approved' || user.role !== 'admin') return send(403, { error: 'Acesso restrito ao administrador.' }); const rows = database().prepare('SELECT id,name,email,role,status,created_at FROM users ORDER BY created_at DESC').all(); return send(200, { users: rows }); }
+    if (req.method === 'POST' && route === '/users') {
+      const user = currentUser(req);
+      if (!user || user.status !== 'approved' || user.role !== 'admin') return send(403, { error: 'Acesso restrito ao administrador.' });
+      const data = await readBody(req); const name = String(data.name || '').trim(); const email = String(data.email || '').trim().toLowerCase(); const password = String(data.password || '');
+      if (name.length < 2 || name.length > 100 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254 || password.length < 6 || password.length > 256) return send(400, { error: 'Preencha nome, e-mail válido e senha com pelo menos 6 caracteres.' });
+      if (database().prepare('SELECT id FROM users WHERE email=?').get(email)) return send(409, { error: 'Este e-mail já está cadastrado.' });
+      database().prepare('INSERT INTO users(name,email,password,role,status) VALUES(?,?,?,?,?)').run(name, email, hash(password), 'user', 'approved');
+      return send(201, { ok: true });
+    }
     const match = /^\/users\/(\d+)\/(approve|reject)$/.exec(route);
     if (req.method === 'POST' && match) { const user = currentUser(req); if (!user || user.status !== 'approved' || user.role !== 'admin') return send(403, { error: 'Acesso restrito ao administrador.' }); const outcome = database().prepare("UPDATE users SET status=? WHERE id=? AND role='user' AND status='pending'").run(match[2] === 'approve' ? 'approved' : 'rejected', Number(match[1])); if (!outcome.changes) return send(404, { error: 'Cadastro pendente não encontrado.' }); return send(200, { ok: true }); }
     send(404, { error: 'Rota não encontrada.' });

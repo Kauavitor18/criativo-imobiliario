@@ -12,6 +12,8 @@ Criar peças publicitárias para imóveis a partir de fotos, descrição e confi
 
 ## Clientes e identidade visual
 
+- Kaua esclareceu em 23/11/2026: no cadastro, o usuário informa o nome do cliente e envia imagens de referência; o sistema identifica automaticamente paleta, características tipográficas, composição e estilo. O usuário não precisa preencher esses dados manualmente.
+- Kaua pediu a opção **Original**: usar os posts enviados como referência principal de identidade visual, buscando fidelidade à composição, cores e tipografia do cliente. A logo original cadastrada deve acompanhar suas peças.
 - Cadastrar um cliente e associar suas referências visuais; uma logo pode ser fornecida.
 - Analisar os posts de referência e registrar, no mínimo, resumo da identidade, cores (principal, secundária, destaque e paleta), tipografia, estilo visual, elementos recorrentes e tags.
 - Utilizar o perfil como referência na geração dos criativos desse cliente. A forma de combinar o perfil com cada estilo predefinido ainda será detalhada.
@@ -26,7 +28,7 @@ Criar peças publicitárias para imóveis a partir de fotos, descrição e confi
 - Textos sobre gradientes suaves, leve desfoque ou sobreposições sutis. Não usar barras sólidas nem retângulos rígidos como áreas de texto; manter a parte inferior limpa e natural, sem reservar espaço vazio artificialmente.
 - Detalhes informados, como preço, metragem, vantagens e descontos, podem ter destaque adicional, ícones e fundos para evidenciá-los. Conciliar esse destaque com a proibição de barras sólidas e blocos rígidos para texto.
 - Recursos abstratos e luzes sutis são permitidos como decoração, sem competir com o imóvel. Quando não houver logo, não criar símbolos que representem marca.
-- Se uma logo for fornecida, usar exatamente a imagem fornecida, sem deformá-la, como assinatura discreta e visível; preferir parte superior ou canto. Sem logo: nenhuma palavra ou placeholder de logo, símbolo genérico de marca ou espaço reservado a ela.
+- Regra padrão para todos os estilos: se o cliente possuir logo cadastrada, incluí-la automaticamente em todas as artes usando o arquivo original, sem deformação; preferir parte superior ou canto. Uma logo fornecida para a arte pode substituir a cadastrada. Sem logo: nenhuma palavra ou placeholder de logo, símbolo genérico de marca ou espaço reservado a ela.
 - Formatos da documentação visual: feed quadrado 1080 × 1080, feed esticado 1080 × 1350 e Story/Reels 1080 × 1920. A entrega exata depende de validar o processamento e os formatos aceitos pelo modelo.
 - Expansão de céu é um bloco opcional dos exemplos: restringir a alteração ao céu e preservar a fidelidade do imóvel. Trata-se de exceção delimitada à preservação literal da foto, não autorização para alterar o imóvel.
 - Cada geração tem identificador único; os IDs recebidos são exemplos de execuções anteriores, não valores fixos.

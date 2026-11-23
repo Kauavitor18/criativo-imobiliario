@@ -1,0 +1,43 @@
+# Investigação e alterações — modo Original
+
+## Fluxo investigado
+
+O projeto é um protótipo local React/Vite. As contas usam SQLite e sessões em memória no middleware do Vite; perfis e histórico ficam no localStorage do navegador. O upload salva referências em `.local/referencias-clientes/<pasta>` e registra `owner.json` com o usuário. A logo fica no localStorage do perfil e também é copiada quando o cadastro atual salva as referências. Diretórios antigos sem `owner.json` não provam a quem pertencem e não são vinculados automaticamente.
+
+Antes desta alteração, a análise de marca enviava todas as imagens juntas ao `gpt-4o-mini` (Responses API) e guardava um resumo único. No modo Original a criação selecionava automaticamente as primeiras quatro imagens da pasta; enviava foto do imóvel, essas referências e logo ao `gpt-image-1.5` (Images edits) com o prompt geral mais um bloco curto para Original. O modelo produzia a imagem inteira. A foto, a logo, preço e texto eram pedidos ao modelo, sem camada separada, e não havia escolha de referência individual, conferência automática de fidelidade, comparação visual ou variações planejadas. O histórico guardava apenas dados básicos.
+
+Causas concretas: síntese das referências em um perfil genérico; até quatro imagens misturadas na geração sem vincular a uma peça específica; prompt base universal com regras conflitantes com algumas referências, como proibição de faixas; ausência de geometria e montagem controlada; imagem e marca entregues ao gerador para redesenho; nenhum verificador de texto, posições ou ativos. Os exemplos Aurum anteriores nesta conversa foram gerados pela ferramenta de imagens do assistente, não pelo fluxo do aplicativo, e não demonstram que uma geração real do aplicativo foi validada.
+
+## Mudanças
+
+- `original-api.ts`: lista e fornece referências individuais somente ao usuário dono; analisa uma imagem selecionada com o mesmo `gpt-4o-mini` já usado no projeto. Armazena análise por hash e versão, na pasta do cliente, e reaproveita quando a imagem não mudou. Não combina imagens para decidir composição e não infere com confiança identidade recorrente a partir de uma peça só. Retorna estimativas de finalidade, cores, tipografia, composição, elementos, limites e caixas proporcionais da foto, textos e marca.
+- `OriginalPanel.tsx`: apresenta miniaturas, escolha manual, análise individual, título literal e identificação profissional informada. Não inventa dados e não exige identificação ausente; pede confirmação humana quando necessária.
+- `original-engine.mjs`: monta o Original no navegador em canvas a partir da foto original, texto digitado e logo original, usando as regiões estimadas. Aplica escala proporcional sem recorte para foto e logo. Verifica geometria, colisões, encaixe de texto e amostra de contraste; impede montagem que não caiba ou tenha colisões e apresenta avisos. Os blocos são camadas de desenho durante a montagem; o PNG final é achatado, não é um documento editável.
+- `Workspace.tsx`, `workspace.css`, `vite.config.ts`: acesso ao painel, apresentação e registro do middleware. Os outros estilos continuam com o fluxo anterior de geração.
+- `original-engine.test.mjs`: testes das funções de geometria, quebra, contraste e validação.
+
+## Seleção e limitações
+
+A escolha é manual; o sistema não recomenda automaticamente uma referência pelo briefing. É possível analisar cada imagem individualmente ao selecioná-la, mas não se faz uma análise coletiva que comprove características recorrentes entre imagens. A IA não analisa fotos de clientes diferentes em conjunto. O cadastro salva imagens localmente e perfis no navegador; não há migração automática de pastas antigas sem comprovação de proprietário. Não há suporte neste modo a duas fotos, expansão de céu, edição visual das camadas, fontes oficiais, tratamento complexo, gradientes ou elementos decorativos arbitrários. Fontes serif/sans-serif e cores são aproximações, e regras para fotografia sem cortes podem criar áreas de fundo ou exigir ajustes. Somente a logo selecionada/cadastrada é aplicada: não é extraída das referências. Não há seleção entre versões de logo.
+
+O modo Original não pede à IA para reescrever o briefing ou sugerir texto: o título e as informações inseridas são reproduzidos. A quebra pode mudar por necessidade de espaço. O usuário informa manualmente CRECI e outros dados profissionais quando necessários; não há regra que identifique automaticamente quando são obrigatórios. As verificações geométricas e a amostragem de contraste são assistivas, não são um escore de fidelidade nem substituem conferência visual. As fotos podem ser parcialmente cobertas pelas camadas de texto ou por preenchimentos observados, e a aplicação alerta sobre a necessidade de revisar. O sistema não reconhece automaticamente detalhes importantes do imóvel nem mede fidelidade à referência em nível de pixels.
+
+## Aurum: comparação manual
+
+Foram observadas as seis imagens em `.local/referencias-clientes/aurum-126aa256`. Elas têm diferentes finalidades e composições; a imagem `referencia-4.jpg` utiliza título superior serifado inclinado, acento dourado, informações abaixo e assinatura central inferior. A amostra anterior `exemplos-aurum/original-revisado.png`, criada na conversa, aproximou essa estrutura mas foi gerada como imagem única e recriou a logo a partir de referências, sem garantir fidelidade ao arquivo original.
+
+A amostra `exemplos-aurum/validacao-camadas-manual.png` foi montada no navegador com posições definidas manualmente a partir da referência 4, sem fazer chamada de IA. O prédio foi usado como arquivo original; título e números foram desenhados pela aplicação. A logo oficial da Aurum não estava disponível no diretório das referências, por isso a amostra não possui logo. A comparação revelou contraste insuficiente do texto branco sobre a fachada e não reproduz a faixa dourada, a família exata de fonte ou a composição com a mesma precisão: é uma prova da montagem, não um resultado aprovado ou teste de análise automática. A verificação de contraste adicionada avisa sobre esse problema. O prédio e os dados usados são fictícios.
+
+## Testes e custos
+
+`node --test original-engine.test.mjs` cobre escala proporcional, geometria, encaixe, colisões, contraste e texto. Uma cópia isolada em `/private/tmp` verificou autenticação, salvamento e leitura da referência, erro de chave ausente, bloqueio de outro usuário e caminhos inválidos, sem alterar o cadastro real. O navegador foi usado em modo headless para montar a amostra e verificar avisos; a comparação não prova qualidade do serviço de análise. `npx tsc --noEmit` e `npm run build` passaram.
+
+O modo Original deixa de chamar o gerador de imagens e chama `gpt-4o-mini` uma vez por referência escolhida ainda não analisada. Cada análise inicial pode ter custo; o cache local evita repetir a chamada. Os demais estilos permanecem no `gpt-image-1.5`. Sem créditos válidos não foi possível validar uma resposta real da API de análise, nem testar a análise e criação completas para a Aurum. Não houve troca de fornecedor nem modelo.
+
+## Ajuste posterior — elementos da referência
+
+A análise individual foi ampliada para identificar faixas, linhas e molduras com posições proporcionais, cor, opacidade, cantos e espessura, além do alinhamento vertical e entrelinhas dos blocos. O montador desenha apenas os elementos descritos; não cria efeitos de brilho, sombra ou gradiente por conta própria. Se uma moldura ou linha puder cruzar texto ou logo, o resultado apresenta aviso. A versão da análise mudou para v3: referências já analisadas precisarão de uma nova chamada paga uma vez, e depois o resultado será reutilizado. O prompt geral e os segmentos não foram alterados.
+
+Três exemplos foram montados pelo próprio motor em `exemplos-eleve-original-v2/`, com fotografia fictícia e arquivo original da logo da Elevé. As posições e elementos foram definidos manualmente a partir das referências existentes, pois não havia créditos para uma análise real. Portanto, demonstram o montador, não validam a precisão do modelo. A segunda amostra teve texto reduzido para caber; na terceira, a foto inteira ocupa apenas parte da arte e o restante utiliza a cor de fundo estimada. Os exemplos não são prova de fidelidade completa nem devem ser usados como anúncios reais.
+
+Testes: 12 testes de geometria, texto, logo, faixa e moldura passaram; verificação de tipos e build passaram. Em uma cópia local isolada, uma resposta simulada testou seleção de uma referência por chamada, prompt específico, cache e isolamento por usuário. A API real não foi validada e a reprodução de efeitos mais complexos e de fontes oficiais continua limitada.
