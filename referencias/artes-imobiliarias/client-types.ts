@@ -1,3 +1,3 @@
 export type Analysis = { colors: string; typography: string; style: string; composition: string; elements: string; summary: string };
-export type Profile = { id: string; name: string; colors: string; notes: string; analysis?: Analysis; analysisStale?: boolean; logoData?: string; referenceFolder?: string };
-export type Entry = { id: string; date: string; description: string; segment: string; format: string; profileId?: string; profileName?: string };
+export type Profile = { id: string; name: string; colors: string; notes: string; analysis?: Analysis; analysisStale?: boolean; logoData?: string; logos?: {id:string; name:string; data:string}[]; fontData?: string; fontName?: string; referenceFolder?: string };
+export type Entry = { id: string; date: string; description: string; segment: string; format: string; profileId?: string; profileName?: string; savedImage?: boolean; title?: string; professional?: string; referenceFile?: string; referenceLabel?: string; warnings?: string[] };

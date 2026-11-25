@@ -86,7 +86,7 @@ export async function loadImage(source) {
   try { return await new Promise((resolve, reject) => { const image = new Image(); image.onload = () => resolve(image); image.onerror = () => reject(new Error('Não foi possível abrir uma das imagens.')); image.src = url; }); }
   finally { if (typeof source !== 'string') URL.revokeObjectURL(url); }
 }
-export async function renderOriginal({ plan, photo, logo, title, details, professional, width, height }) {
+export async function renderOriginal({ plan, photo, logo, title, details, professional, width, height, fontFamily }) {
   validateAnalysis(plan);
   if (!title.trim()) throw new Error('Informe o título exato que deve aparecer na arte.');
   const canvas = document.createElement('canvas'); canvas.width = width; canvas.height = height;
@@ -110,7 +110,7 @@ export async function renderOriginal({ plan, photo, logo, title, details, profes
     const padding = Math.min(w*.04, height*.015);
     const lineHeight = Number.isFinite(block.lineHeight) ? Math.max(.9, Math.min(2, block.lineHeight)) : 1.18;
     while (size >= min) {
-      ctx.font = `${block.italic ? 'italic ' : ''}${block.bold ? '700' : '400'} ${size}px ${block.font}`;
+      ctx.font = `${block.italic ? 'italic ' : ''}${block.bold ? '700' : '400'} ${size}px ${fontFamily || block.font}`;
       lines = wrapText(text, value => ctx.measureText(value).width, w-padding*2);
       if (lines && lines.length * size * lineHeight <= h-padding*2) break;
       lines = null; size -= 2;
