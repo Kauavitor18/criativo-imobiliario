@@ -6,6 +6,7 @@ import { authApi } from './auth-api';
 import { originalApi } from './original-api';
 import { clientApi } from './client-api';
 import { historyApi } from './history-api';
+import { exemplosApi } from './exemplos-api';
 
 export default defineConfig(() => {
     return {
@@ -13,7 +14,7 @@ export default defineConfig(() => {
         port: 3000,
         host: '127.0.0.1',
       },
-      plugins: [react(), authApi(), creativeApi(), originalApi(), clientApi(), historyApi()],
+      plugins: [react(), authApi(), creativeApi(), originalApi(), clientApi(), historyApi(), exemplosApi()],
       resolve: {
         alias: {
           '@': path.resolve(__dirname, '.'),

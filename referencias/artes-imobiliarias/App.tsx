@@ -4,6 +4,7 @@ import Workspace from './Workspace';
 import Admin from './Admin';
 import './workspace.css';
 import './entry.css';
+import './social-theme.css';
 
 type User = { id: number; name: string; email: string; role: 'admin' | 'user'; status: string };
 type Account = User & { created_at: string };

@@ -1,0 +1,93 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+/* Identidade visual compartilhada com o painel Socialmidia da Action X. */
+:root { font-family: Poppins, sans-serif; color: #f4f0ea; background: #0b0a09; }
+body, button, input, textarea, select { font-family: Poppins, sans-serif; }
+::selection { background: #d84a23; color: #f4f0ea; }
+.shell, .main { background: #0b0a09; color: #f4f0ea; }
+.sidebar { background: #0f0d0c; color: #b6aaa2; border-right: 1px solid #ffffff1a; border-radius: 0; box-shadow: none; }
+.brand-icon, .avatar { background: #d84a23; color: #fff; border-radius: 10px; }
+.brand strong, .brand strong span { color: #f4f0ea; }
+.brand strong span { color: #d84a23; }
+.brand small, .side-label { color: #a79a90; }
+.sidebar nav button { color: #bbaea4; border-radius: 9px; }
+.sidebar nav button:hover { background: #ffffff10; color: #fff; }
+.sidebar nav button.active { background: #d84a2326; color: #ff8969; }
+.side-tip { background: #171412; border: 1px solid #ffffff1a; color: #ee9a7d; border-radius: 12px; }
+.side-tip p, .user small { color: #a99c92; }
+.user { border-color: #ffffff1a; }
+.topbar { background: #0b0a09; border-color: #ffffff1a; }
+.topbar span, .preview-heading>div>span, .topright { color: #a4978e; }
+.topbar p, .section-top h2, .preview-heading h2, .subheading { color: #f4f0ea; }
+.topright i { background: #3fa35c; }
+.page-head h1, .client-detail-head h1, .empty-preview strong { font-family: Poppins, sans-serif; font-weight: 600; letter-spacing: -.04em; color: #f4f0ea; }
+.page-head h1 em { color: #ed7354; font-style: normal; }
+.eyebrow, .entry-kicker { color: #e76a48; }
+.page-head p, .section-top p, .client-detail-head p { color: #ab9f96; }
+.card, .profile-empty, .prompt-box, .client-list-item, .art-history-card { background: #171412; border-color: #ffffff1a; color: #f4f0ea; box-shadow: none; border-radius: 14px; }
+.number, .history-icon, .client-list-logo, .client-heading-mark { background: #d84a2324; color: #ee8063; border-radius: 9px; }
+.segments button, .formats button { background: #0b0a09; border-color: #ffffff1f; color: #ded5ce; border-radius: 10px; }
+.segments button:hover, .formats button:hover { border-color: #d84a23; transform: none; }
+.segments button.selected, .formats button.selected { background: #d84a231c; border-color: #d84a23; color: #f4f0ea; }
+.seg-icon { color: #e86a48; display: inline-flex; }
+.field-label { color: #b5a79c; }
+textarea, input:not([type=file]):not([type=checkbox]), select { background: #0b0a09; border-color: #ffffff24; color: #f4f0ea; }
+textarea:focus, input:focus, select:focus { border-color: #d84a23; }
+textarea::placeholder, input::placeholder { color: #857a73; }
+.drop, .client-logo-box, .client-empty, .client-analysis-grid>div { background: #211c18; border-color: #ffffff24; color: #bba89b; }
+.drop strong, .client-analysis-grid p { color: #e3d9d2; }
+.drop span, .mini-note, .footnote, .preview-caption, .preview-note p { color: #a99a90; }
+.switch-row, .preview-note, .client-tabs { border-color: #ffffff1a; }
+.switch-row input { accent-color: #d84a23; }
+.primary, .client-create, .entry-primary, .small-primary { background: #d84a23; color: #fff; border-color: #d84a23; border-radius: 9px; }
+.primary:hover, .client-create:hover, .entry-primary:hover, .small-primary:hover { background: #bd3c1a; }
+.primary:disabled, button:disabled { cursor: not-allowed; opacity: .6; }
+.preview-frame { background: #211c18; border: 1px solid #ffffff1a; border-radius: 14px; }
+.preview-overlay { background: linear-gradient(transparent,#0b0a09d9); }
+.empty-preview>div { background: #35231d; color: #e97c5e; }
+.ratio, .client-count { background: #2b211c; color: #f0a28b; }
+.preview-note>span, .prompt-box button, .client-link, .client-back, .client-list-action, .client-card-title, .original-variants a { color: #ed8264; }
+.notice, .client-status, .original-selection, .original-message { background: #33231d; color: #ffd0bf; }
+.client-list-item:hover { border-color: #d84a23; box-shadow: none; }
+.client-list-item p, .client-analysis-grid span, .client-gallery figcaption, .art-history-info p { color: #b2a49a; }
+.client-tabs button { color: #a99c93; }
+.client-tabs button.active { border-bottom-color: #d84a23; color: #f58b70; }
+.client-gallery figure, .art-history-card>a, .art-history-missing, .original-variants article { background: #211c18; border-color: #ffffff1a; }
+.client-gallery img { background: #0b0a09; }
+.client-card-title h2 { color: #f4f0ea; }
+.client-card-title p, .client-add span, .client-note { color: #b1a49a; }
+.reference-save { color: #f5ae99; border-color: #d84a23; }
+.art-history-actions a, .art-history-actions button { color: #f58b70; }
+.original-analysis, .original-review { background: #211c18; border-color: #ffffff1a; color: #e7d9d0; }
+.auth-screen, .landing, .entry-loading { background: #0b0a09; color: #f4f0ea; }
+.auth-card, .admin-list { background: #171412; border-color: #ffffff1a; }
+.auth-card form label>div { background: #0b0a09; border-color: #ffffff24; }
+.auth-card h1, .landing h1, .landing-info h2, .landing-bottom p { font-family: Poppins, sans-serif; font-weight: 600; letter-spacing: -.04em; }
+.auth-card h1 em, .landing h1 em, .landing-info h2 em, .landing-bottom em { color: #e86b49; font-style: normal; }
+.entry-logo span, .entry-kicker span { background: #d84a23; color: white; }
+.entry-logo i, .auth-switch button { color: #ed8060; }
+.landing-info { background: #171412; color: #f4f0ea; }
+.info-steps div { border-color: #ffffff24; }
+.info-steps p { color: #b4a69c; }
+.landing-bottom { background: #211c18; }
+.landing-bottom button { color: #f4ad98; border-color: #d84a23; }
+.entry-primary, .small-primary { color: #fff; }
+@media(max-width:600px) { .sidebar { border-radius: 16px 16px 0 0; border: 1px solid #ffffff1a; } }
+/* Administração e estados de interação. */
+.admin-shell, .admin-main { background: #0b0a09; color: #f4f0ea; font-family: Poppins, sans-serif; }
+.admin-side { background: #0f0d0c; border-color: #ffffff1a; border-radius: 0; }
+.admin-wordmark>span, .admin-nav-active>span, .admin-create-toggle, .admin-create-form>button { background: #d84a23; color: #fff; }
+.admin-nav-active { background: #d84a2326; color: #ff967b; }
+.admin-nav-title, .admin-top, .admin-page-title p, .admin-panel-heading p { color: #a99c93; }
+.admin-top, .admin-side-bottom { border-color: #ffffff1a; }
+.admin-page-title h1 { font: 600 38px/1.15 Poppins, sans-serif; letter-spacing: -.04em; }
+.admin-page-title h1 em, .admin-breadcrumb, .admin-small-label { color: #ed7354; font-style: normal; }
+.admin-badge, .admin-stats>button, .admin-panel, .admin-create-form { background: #171412; border-color: #ffffff1a; }
+.admin-create-fields input, .admin-search { background: #0b0a09; border-color: #ffffff24; color: #f4f0ea; }
+.admin-person { border-color: #ffffff1a; }
+.admin-person:hover { background: #211c18; }
+.admin-refresh, .admin-return { color: #d6c8be; border-color: #ffffff24; }
+.admin-refresh:hover, .admin-return:hover { background: #211c18; border-color: #d84a23; }
+.admin-feedback { background: #33231d; color: #ffd0bf; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid #ed8060; outline-offset: 2px; }
+@media(max-width:760px) { .admin-side { border-radius: 0 0 14px 14px; } .admin-page-title h1 { font-size: 32px; } }
