@@ -101,7 +101,7 @@ export async function renderOriginal({ plan, photo, logo, title, details, profes
   const blocks = [{ name:'título', box:normalizeBox(plan.title.box) }, ...(details.trim() ? [{ name:'informações', box:normalizeBox(plan.details.box) }] : []), ...(professional.trim() ? [{ name:'identificação profissional', box:normalizeBox(plan.professional.box) }] : []), ...(logo ? [{ name:'logo', box:normalizeBox(plan.logo) }] : [])];
   for (let i=0; i<blocks.length; i++) for (let j=i+1; j<blocks.length; j++) if (boxesOverlap(blocks[i].box,blocks[j].box)) throw new Error(`As áreas de ${blocks[i].name} e ${blocks[j].name} se sobrepõem na análise. Escolha outra referência.`);
   for (const block of blocks) if ((plan.graphicLayers || []).some(layer => graphicOverlapsBox(layer,block.box))) warnings.push(`Uma linha ou moldura pode cruzar ${block.name}; revise a composição antes de usar.`);
-  warnings.push('A tipografia e as posições são aproximações da referência; fontes oficiais, gradientes e efeitos complexos não são reproduzidos automaticamente.');
+  warnings.push(fontFamily ? 'As posições são aproximações da referência; gradientes e efeitos complexos não são reproduzidos automaticamente.' : 'A tipografia e as posições são aproximações da referência; fontes oficiais, gradientes e efeitos complexos não são reproduzidos automaticamente.');
   if (fit.w < width - 1 || fit.h < height - 1) warnings.push('A foto inteira foi preservada; a área restante foi preenchida pela cor de fundo estimada da referência.');
   const renderText = (text, block, label) => {
     if (!text.trim()) return;

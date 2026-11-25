@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { renderOriginal } from './original-engine.mjs';
 
-type Props = { folder?: string; clientName?: string; clientFont?: string; clientFontName?: string; photo: File | null; secondPhoto: boolean; logo: File | string | null; details: string; apiKey: string; format: number; onResult: (image: string, warnings: string[], title: string, professional: string, referenceFile: string, referenceLabel: string) => void; onInvalidate: () => void; onSaveVariant: (image:string, warnings:string[], title:string, professional:string, referenceFile:string, referenceLabel:string, formatIndex:number) => void; reuse?: { title?: string; professional?: string; referenceFile?: string; key: string } | null };
+type Props = { folder?: string; clientName?: string; clientFont?: string; clientFontName?: string; photo: File | null; secondPhoto: boolean; logo: File | string | null; details: string; apiKey: string; format: number; onResult: (image: string, warnings: string[], title: string, professional: string, referenceFile: string, referenceLabel: string, draft: OriginalDraft) => void; onInvalidate: () => void; onSaveVariant: (image:string, warnings:string[], title:string, professional:string, referenceFile:string, referenceLabel:string, formatIndex:number, draft: OriginalDraft) => void; reuse?: { title?: string; professional?: string; referenceFile?: string; draft?: OriginalDraft; key: string } | null };
+export type OriginalDraft = { plan: any; photo: string; logo?: string };
+const dataUrl = (source: File | string): Promise<string> => typeof source === 'string' ? Promise.resolve(source) : new Promise((resolve,reject)=>{const r=new FileReader();r.onload=()=>resolve(String(r.result));r.onerror=()=>reject(new Error('Não foi possível salvar a imagem de origem.'));r.readAsDataURL(source);});
 const dimensions = [[1080,1080],[1080,1350],[1080,1920]];
 
 export default function OriginalPanel({ folder, clientName, clientFont, clientFontName, photo, secondPhoto, logo, details, apiKey, format, onResult, onInvalidate, onSaveVariant, reuse }: Props) {
+  const revision = useRef(0);
   const [files, setFiles] = useState<string[]>([]); const [selected, setSelected] = useState('');
   const [analysis, setAnalysis] = useState<any>(null); const [title, setTitle] = useState('');
   const [layer, setLayer] = useState('title'); const [fontFamily, setFontFamily] = useState(''); const [fontFile, setFontFile] = useState('');
@@ -15,11 +18,12 @@ export default function OriginalPanel({ folder, clientName, clientFont, clientFo
     if (folder) fetch(`/api/original?folder=${encodeURIComponent(folder)}`).then(async r => { const data=await r.json(); if (!r.ok) throw new Error(data.error); if (active) setFiles(data.files); }).catch(e=>{ if(active) setMessage(e.message || 'Não foi possível carregar as referências.'); });
     return () => { active=false; };
   }, [folder]);
-  useEffect(() => { if (reuse) { setTitle(reuse.title || ''); setProfessional(reuse.professional || ''); if (reuse.referenceFile && files.includes(reuse.referenceFile)) setSelected(reuse.referenceFile); } }, [reuse, files]);
+  useEffect(() => { if (reuse) { setTitle(reuse.title || ''); setProfessional(reuse.professional || ''); if (reuse.referenceFile && files.includes(reuse.referenceFile)) { setSelected(reuse.referenceFile); if (reuse.draft?.plan) setAnalysis(structuredClone(reuse.draft.plan)); } } }, [reuse, files]);
   useEffect(() => { let active=true; setFontFamily(''); setFontFile(''); if (clientFont) { const family=`MarcaOriginal${crypto.randomUUID().replace(/-/g,'')}`; const face=new FontFace(family, `url(${clientFont})`); face.load().then(loaded=>{if(active){document.fonts.add(loaded);setFontFamily(family);setFontFile(clientFontName || 'Fonte do cliente');}}).catch(()=>{if(active)setMessage('Não foi possível carregar a fonte do cliente.');}); } return ()=>{active=false}; }, [clientFont,clientFontName]);
   function updateLayer(key: string, value: number | string) { setAnalysis((old:any) => { if (!old) return old; const next=structuredClone(old); const item = layer === 'photo' || layer === 'logo' ? next[layer] : next[layer].box; if (['x','y','w','h'].includes(key)) item[key]=Number(value); else next[layer][key]=value; return next; }); setVariants([]); onInvalidate(); }
   async function loadFont(file: File | undefined) { if (!file) return; if (file.size > 5*1024*1024 || !/\.(woff2?|ttf|otf)$/i.test(file.name)) { setMessage('Use uma fonte WOFF, WOFF2, TTF ou OTF de até 5 MB.'); return; } try { const family=`MarcaOriginal${crypto.randomUUID().replace(/-/g,'')}`; const font=new FontFace(family, await file.arrayBuffer()); await font.load(); document.fonts.add(font); setFontFamily(family); setFontFile(file.name); setVariants([]); onInvalidate(); } catch { setMessage('Não foi possível carregar esta fonte.'); } }
   useEffect(() => { setVariants([]); }, [photo, logo, details, title, professional, folder]);
+  useEffect(() => { revision.current += 1; }, [folder, selected, analysis, photo, logo, details, title, professional, format, fontFamily]);
   async function analyze() {
     if (!folder || !selected || busy) return;
     setBusy(true); setMessage(''); setAnalysis(null); setVariants([]);
@@ -33,25 +37,28 @@ export default function OriginalPanel({ folder, clientName, clientFont, clientFo
   async function create() {
     if (!analysis || !photo || busy) { setMessage('Analise a referência e adicione uma foto do imóvel.'); return; }
     if (secondPhoto) { setMessage('O modo Original monta uma foto por vez. Remova a segunda foto para continuar.'); return; }
-    setBusy(true); setMessage('');
+    setBusy(true); setMessage(''); const currentRevision=revision.current;
     try {
       const [width,height]=dimensions[format];
       const result=await renderOriginal({plan:analysis,photo,logo,title,details,professional,width,height,fontFamily});
-      onResult(result.image,result.warnings,title.trim(),professional.trim(),selected,`Referência ${files.indexOf(selected)+1}`); setMessage('Arte montada. Confira o resultado e os avisos antes de baixar.');
+      const draft: OriginalDraft = {plan:structuredClone(analysis),photo:await dataUrl(photo),...(logo ? {logo:await dataUrl(logo)} : {})};
+      if (currentRevision !== revision.current) { setMessage('Os dados mudaram durante a montagem. Monte novamente.'); return; }
+      onResult(result.image,result.warnings,title.trim(),professional.trim(),selected,`Referência ${files.indexOf(selected)+1}`,draft); setMessage('Arte montada. Confira o resultado e os avisos antes de baixar.');
     } catch(e) { setMessage(e instanceof Error ? e.message : 'Não foi possível montar a arte.'); }
     finally { setBusy(false); }
   }
   async function createVariants() {
     if (!analysis || !photo || secondPhoto || busy) { setMessage('Analise uma referência e selecione uma foto para criar os formatos.'); return; }
-    setBusy(true); setMessage(''); const results: {name:string;image:string;warnings:string[];formatIndex:number}[] = []; const failures:string[]=[];
+    setBusy(true); setMessage(''); const currentRevision=revision.current; const results: {name:string;image:string;warnings:string[];formatIndex:number}[] = []; const failures:string[]=[];
     for (const [i, name] of ['Feed quadrado','Feed vertical','Story / Reels'].entries()) { try { const [width,height]=dimensions[i]; const result=await renderOriginal({plan:analysis,photo,logo,title,details,professional,width,height,fontFamily}); results.push({name,formatIndex:i,...result}); } catch(e) { failures.push(`${name}: ${e instanceof Error ? e.message : 'não foi possível montar'}`); } }
+    if(currentRevision !== revision.current) { setMessage('Os dados mudaram durante a montagem. Crie os formatos novamente.'); setBusy(false); return; }
     setVariants(results); setMessage(failures.length ? failures.join(' • ') : 'Formatos criados. Revise cada um antes de baixar.'); setBusy(false);
   }
   const layerBox=analysis && (layer === 'photo' || layer === 'logo' ? analysis[layer] : analysis[layer]?.box);
   return <section className="card original-panel">
     <div className="section-top"><div className="number">05</div><div><h2>Composição original</h2><p>Escolha uma peça de {clientName || 'um cliente'} para orientar esta arte.</p></div></div>
     {!folder ? <p>Selecione um cliente com referências vinculadas. Cadastros antigos sem vínculo precisam ser salvos novamente.</p> : <>
-      <div className="original-references" role="group" aria-label="Escolher referência">{files.map((file,i)=><button type="button" key={file} disabled={busy} aria-pressed={selected===file} className={selected===file?'selected':''} onClick={()=>{setSelected(file);setAnalysis(null);setMessage('');onInvalidate();}}><img src={`/api/original?folder=${encodeURIComponent(folder)}&file=${encodeURIComponent(file)}`} alt={`Referência ${i+1} de ${clientName || 'cliente'}`}/><span>Referência {i+1}</span></button>)}</div>
+      <div className="original-references" role="group" aria-label="Escolher referência">{files.map((file,i)=><button type="button" key={file} disabled={busy} aria-pressed={selected===file} className={selected===file?'selected':''} onClick={()=>{setSelected(file);setAnalysis(null);setVariants([]);setMessage('');onInvalidate();}}><img src={`/api/original?folder=${encodeURIComponent(folder)}&file=${encodeURIComponent(file)}`} alt={`Referência ${i+1} de ${clientName || 'cliente'}`}/><span>Referência {i+1}</span></button>)}</div>
       {!files.length && <p className="mini-note">Nenhuma referência disponível para este cliente.</p>}
       {selected && <p className="original-selection" role="status">✓ Referência {files.indexOf(selected)+1} selecionada como base. Você pode trocar antes de analisar.</p>}
       <button type="button" className="reference-save" onClick={analyze} disabled={!selected || busy}>{busy ? 'Aguarde…' : 'Analisar referência selecionada'}</button>
@@ -69,7 +76,7 @@ export default function OriginalPanel({ folder, clientName, clientFont, clientFo
       </div>}
       <button type="button" className="primary" disabled={!analysis || busy} onClick={create}>{busy ? 'Aguarde…' : 'Montar arte original'}</button>
       <button type="button" className="reference-save" disabled={!analysis || busy} onClick={createVariants}>Criar versões para feed e stories</button>
-      {!!variants.length && <div className="original-variants">{variants.map(v=><article key={v.name}><strong>{v.name}</strong><img src={v.image} alt={`Prévia ${v.name}`}/><a href={v.image} download={`criativo-${v.name.replace(/[^a-z0-9]+/gi,'-').toLowerCase()}.png`}>Baixar {v.name}</a><button type="button" className="reference-save" onClick={()=>onSaveVariant(v.image,v.warnings,title.trim(),professional.trim(),selected,`Referência ${files.indexOf(selected)+1}`,v.formatIndex)}>Salvar no histórico</button><details><summary>Ver avisos ({v.warnings.length})</summary>{v.warnings.map((w,i)=><p key={i}>{w}</p>)}</details></article>)}</div>}
+      {!!variants.length && <div className="original-variants">{variants.map(v=><article key={v.name}><strong>{v.name}</strong><img src={v.image} alt={`Prévia ${v.name}`}/><a href={v.image} download={`criativo-${v.name.replace(/[^a-z0-9]+/gi,'-').toLowerCase()}.png`}>Baixar {v.name}</a><button type="button" className="reference-save" onClick={async()=>{if(!photo||!analysis)return;try{const draft:OriginalDraft={plan:structuredClone(analysis),photo:await dataUrl(photo),...(logo?{logo:await dataUrl(logo)}:{})};onSaveVariant(v.image,v.warnings,title.trim(),professional.trim(),selected,`Referência ${files.indexOf(selected)+1}`,v.formatIndex,draft)}catch{setMessage('Não foi possível salvar as imagens de origem.')}}}>Salvar no histórico</button><details><summary>Ver avisos ({v.warnings.length})</summary>{v.warnings.map((w,i)=><p key={i}>{w}</p>)}</details></article>)}</div>}
     </>}
     {message && <p className="original-message" role="status">{message}</p>}
   </section>;

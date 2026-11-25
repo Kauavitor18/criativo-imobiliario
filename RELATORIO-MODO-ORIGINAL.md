@@ -49,3 +49,10 @@ O painel Original permite ajustar numericamente posição e tamanho das áreas d
 O mesmo plano pode ser montado nos três formatos e cada resultado pode ser baixado ou salvo individualmente no histórico. Como cada formato reaproveita as posições proporcionais, a composição deve ser revista em cada saída; falhas de encaixe são informadas por formato. O histórico permite recuperar dados da criação, cliente, formato e referência, quando disponíveis. A foto não é armazenada como entrada editável e precisa ser selecionada novamente; a análise da referência precisa ser carregada novamente, e ajustes manuais não são restaurados. A imagem final salva continua sendo um PNG achatado.
 
 A validação real com a API e referências de clientes continua pendente de uma chave de API com créditos. Os arquivos locais de referência e os resultados simulados anteriores não comprovam a precisão da análise real.
+
+
+## Recuperação de edição
+
+Novas artes Original salvas no histórico incluem a foto, a logo selecionada e o plano de composição. Ao usar uma criação como base, esses dados são recuperados para permitir nova montagem. Registros anteriores continuam disponíveis, mas não contêm esses dados de edição. A referência deve continuar cadastrada; alterações posteriores à fonte do cliente podem mudar a tipografia restaurada e fontes carregadas apenas na sessão não são armazenadas. O banco local é atualizado sem substituir registros existentes.
+
+A troca de referência descarta as versões previamente montadas e a geração descarta resultados quando as entradas mudam durante a operação. O uso compartilhado e a validação com a API real continuam pendentes.
